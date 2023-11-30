@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddEmailToDenunciafiscalia extends Migration
+class AddFilesToTableDenunciasfiscalia extends Migration
 {
     /**
      * Run the migrations.
@@ -15,6 +15,12 @@ class AddEmailToDenunciafiscalia extends Migration
     {
         Schema::table('denunciafiscalia', function (Blueprint $table) {
             $table->string('email');
+            $table->string('imagen1');
+            $table->string('imagen2');
+            $table->string('archivo1');
+            $table->string('archivo2');
+            $table->string('estado');
+
         });
     }
 
@@ -26,7 +32,12 @@ class AddEmailToDenunciafiscalia extends Migration
     public function down()
     {
         Schema::table('denunciafiscalia', function (Blueprint $table) {
-            //
+            $table->dropColumn('email');
+            $table->dropColumn('imagen1');
+            $table->dropColumn('imagen2');
+            $table->dropColumn('archivo1');
+            $table->dropColumn('archivo2');
+            $table->dropColumn('estado');
         });
     }
 }
