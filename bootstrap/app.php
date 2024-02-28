@@ -28,6 +28,7 @@ if ($app->environment() !== 'production') {
 }
 
 
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->withFacades();
 $app->withEloquent();
 
