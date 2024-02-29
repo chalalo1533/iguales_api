@@ -28,10 +28,13 @@ $router->get('/', function () use ($router) {
         $router->get('videos', 'ExampleController@getVideos');
         $router->get('safePlaces', 'ExampleController@getLugaresSeguros');
         $router->get('notifications', 'ExampleController@getNotificaciones');
- 
+
+        $router->get('fiscalias', 'ExampleController@getFiscalias');
+
+        $router->get('fiscalias_search/{search}', ['uses' =>'ExampleController@getFiscalias']);
 
 
-        $router->post('postDenuncia', 'ExampleController@postDenuncia');
+       $router->post('postDenuncia', 'ExampleController@postDenuncia');
       /*  $router->post('products', 'ProductController@create');
         $router->get('products/{id}', 'ProductController@show');
         $router->delete('products/{id}', 'ProductController@destroy');
