@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSafeplacesTable extends Migration
+class CreateFiscaliasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,21 +16,15 @@ class CreateSafeplacesTable extends Migration
         Schema::create('fiscalias', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('nombre_lugar',100);
-            $table->string('direccion',100);
-            $table->string('comuna',100);
-            $table->string('horario1',100);
-            $table->string('horario2',100);
-            $table->integer('estado');
+            $table->string('nombre',200);
+            $table->string('direccion',200);
+            $table->string('ciudad',100);
+            $table->text('covertura');
             $table->string('lat',100);
-            $table->string('long',100);
-            $table->string('email',100);
-            $table->string('cell',100);
-
-
-
-
-
+            $table->string('lon',100);
+            $table->string('fono',100);
+            $table->string('fono_fax',100);
+            $table->integer('estado');
         });
     }
 
@@ -41,6 +35,6 @@ class CreateSafeplacesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('safeplaces');
+        Schema::dropIfExists('fiscalias');
     }
 }

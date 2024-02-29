@@ -7,6 +7,7 @@ use App\Models\Denunciafiscalia;
 use App\Models\Videos;
 use App\Models\SafePlaces;
 use App\Models\Notificacion;
+use App\Models\Fiscalias;
 use Carbon\Carbon;
 
 use Goutte\Client;
@@ -104,9 +105,21 @@ public function getLugaresSeguros(){
 }
 
 
+public function getFiscalias(Request $request){
+     $comuna = $request->get('comuna');
+     $fiscalias = Fiscalias::where('covertura', 'LIKE', $comuna)->get();
+     return response()->json(array('success'=>true, 'fiscalias'=> $fiscalias ));
+}
+
+
+
 public function getNotificaciones(){
       $notifications = Notificacion::all();
      return response()->json(array('success'=>true, 'notifications'=> $notifications ));
+
+
+
+
 }
 
 
