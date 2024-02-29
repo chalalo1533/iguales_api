@@ -4,13 +4,20 @@ namespace App\Http\Controllers;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Illuminate\Http\Request;
 use App\Models\Denunciafiscalia;
+use App\Models\Videos;
+use App\Models\SafePlaces;
+use App\Models\Notificacion;
 use Carbon\Carbon;
-use Log;
 
+use Goutte\Client;
+use Log;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 
+//require 'vendor/phpmailer/phpmailer/src/Exception.php';
+// require 'vendor\phpmailer\phpmailer\src\PHPMailer.php';
+// require 'vendor\phpmailer\phpmailer\src\SMTP.php';
 
 
 class ExampleController extends Controller
@@ -26,16 +33,197 @@ class ExampleController extends Controller
     }
 
 
+public function postComment_test(Request $request){
+  
+    $name = $request->request->get('name');
+    $email = $request->request->get('email');
+    $text = $request->request->get('text');
+// Log::info($request);
+//     $data = $request->json()->all();
+//     $name = $data["name"];
+//     $email = $data["email"];
+//     $text = $data["text"];
+
+    print('test->'.$name.' email:'.$email.' texto:'.$text);
+
+}
+
+
+public function postComment(Request $request){
+    // Log::info($request);
+    
+    // $name = $request["name"];
+    // $email = $request["email"];
+    // $text = $request["text"];
+
+
+    $name = $request->request->get('name');
+    $email = $request->request->get('email');
+    $text = $request->request->get('text');
+   
+    $path = base_path().'/public';
+    require base_path("vendor/autoload.php");
+    print("Enviando correo...");
+    $mail = new PHPMailer(true);
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.office365.com';
+    $mail->Port       = 587;
+    $mail->SMTPSecure = 'tls';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'gonzalo.perez@surpoint.cl';
+    $mail->Password   = 'Margarina25..,,';
+     $mail->SetFrom('gonzalo.perez@surpoint.cl', 'Gonzalo');
+    $mail->addAddress($email, $name);
+    $mail->IsHTML(true);
+
+
+    $mail->Subject = 'Comentario desde la App Iguales';
+    $mail->Body    = 'El usuario de la aplicación '.$name.' a hecho el siguiente comentario '.$text;
+    
+  
+    if(!$mail->send()) {
+        echo 'Email no pudo ser enviado.';
+        echo 'Mailer Error: ' . $mail->ErrorInfo;
+    } else {
+        echo 'Email se envió.';
+    }
+
+}
+
+
+
+public function getVideos(){
+       $videos = Videos::all();
+       return response()->json(array('success'=>true, 'videos'=> $videos ));
+}
+
+
+public function getLugaresSeguros(){
+      $safe_places = SafePlaces::all();
+     return response()->json(array('success'=>true, 'safe_places'=> $safe_places ));
+}
+
+
+public function getNotificaciones(){
+      $notifications = Notificacion::all();
+     return response()->json(array('success'=>true, 'notifications'=> $notifications ));
+}
+
+
+
 public function postDenuncia(Request $request){
-            Log::info($request);
-            $data = $request->json()->all();
-            $email = $data["email"];
-            $denunciafiscalia = Denunciafiscalia::create($request->all());
+             Log::info($request);
+             $data = $request->json()->all();
+             $denunciafiscalia = Denunciafiscalia::create($request->all());
+        
+          /*   echo $denunciafiscalia['fecha_denuncia'];
+
+             $fecha_denuncia= $data['fecha_denuncia'];
+             $hora_denuncia= $data['hora_denuncia'];
+
+             $nombres_denunciante = $data['nombres_denunciante'];
+             $apepat_denunciante = $data['apepat_denunciante'];
+             $apemat_denunciante = $data['apemat_denunciante'];
+
+             $rutpas_denunciante = $data['rutpas_denunciante'];
+             $fechanac_denunciante = $data['fechanac_denunciante'];
+             $edad_denunciante = $data['edad_denunciante'];
+             $sexo_denunciante = $data['sexo_denunciante'];
+             $nacionalidad_denunciante = $data['nacionalidad_denunciante'];
+             $estcivil_denunciante = $data['estcivil_denunciante'];
+
+             $escolaridad_denunciante = $data['escolaridad_denunciante'];
+             $prof_denunciante = $data['prof_denunciante'];
+             $lugartrabajo_denunciante = $data['lugartrabajo_denunciante'];
+
+             $avdacp_denunciante = $data['avdacp_denunciante'];
+             $blockdepto_denunciante = $data['blockdepto_denunciante'];
+             $villapob_denunciante = $data['villapob_denunciante'];
+             $comuna_denunciante = $data['comuna_denunciante'];
+
+             $region_denunciante = $data['region_denunciante'];
+             $telefono_denunciante = $data['telefono_denunciante'];
+             $horariocontacto_denunciante = $data['horariocontacto_denunciante'];
+             $correo_denunciante = $data['correo_denunciante'];
+             $patentesco_denunciante = $data['patentesco_denunciante'];
+
+
+             $nombres_victima = $data['nombres_victima'];
+             $apepat_victima = $data['apepat_victima'];
+             $apemat_victima = $data['apemat_victima'];
+             $rutpas_victima = $data['rutpas_victima'];
+             $fechanac_victima = $data['fechanac_victima'];
+             $edad_victima = $data['edad_victima'];
+             $sexo_victima = $data['sexo_victima'];
+             $estcivil_victima = $data['estcivil_victima'];
+             $nacionalidad_victima = $data['nacionalidad_victima'];
+             $escolaridad_victima = $data['escolaridad_victima'];
+             $prof_victima = $data['prof_victima'];
+             $lugartrabajo_victima = $data['lugartrabajo_victima'];
+             $avdacp_victima = $data['avdacp_victima'];
+             $blockdepto_victima = $data['blockdepto_victima'];
+             $villapob_victima = $data['villapob_victima'];
+             $comuna_victima = $data['comuna_victima'];
+             $region_victima = $data['region_victima'];
+             $telefono_victima = $data['telefono_victima'];
+             $horariocontacto_victima = $data['horariocontacto_victima'];
+             $correo_victima = $data['correo_victima'];
+
+             $nombre_victima_ap = $data['nombre_victima_ap'];
+             $rut_victima_ap = $data['rut_victima_ap'];
+             $domicilio_victima_ap = $data['domicilio_victima_ap'];
+             $telefono_victima_ap = $data['telefono_victima_ap'];
+             $email_victima_ap = $data['email_victima_ap'];
+             $vinculo_victima_ap = $data['vinculo_victima_ap'];
+
+
+             $nombres_denunciado = $data['nombres_denunciado'];
+             $apepat_denunciado = $data['apepat_denunciado'];
+             $apemat_denunciado = $data['apemat_denunciado'];
+             $apodo_denunciado = $data['apodo_denunciado'];
+             $rutpas_denunciado = $data['rutpas_denunciado'];
+             $fechanac_denunciado = $data['fechanac_denunciado'];
+             $edad_denunciado = $data['edad_denunciado'];
+             $sexo_denunciado = $data['sexo_denunciado'];
+             $estcivil_denunciado = $data['estcivil_denunciado'];
+             $nacionalidad_denunciado = $data['nacionalidad_denunciado'];
+             $escolaridad_denunciado = $data['escolaridad_denunciado'];
+             $prof_denunciado = $data['prof_denunciado'];
+             $lugartrabajo_denunciado = $data['lugartrabajo_denunciado'];
+             $avdacp_denunciado = $data['avdacp_denunciado'];
+             $blockdepto_denunciado = $data['blockdepto_denunciado'];
+             $villapob_denunciado = $data['villapob_denunciado'];
+             $comuna_denunciado = $data['comuna_denunciado'];
+             $provincia_denunciado = $data['provincia_denunciado'];
+             $region_denunciado = $data['region_denunciado'];
+             $telefono_denunciado = $data['telefono_denunciado'];
+             $horariocontacto_denunciado = $data['horariocontacto_denunciado'];
+             $correo_denunciado = $data['correo_denunciado'];
+             $descripcion_denunciado = $data['descripcion_denunciado'];
+             $vinculo_denunciado = $data['vinculo_denunciado'];
+
+
+             $fecha_hecho = $data['fecha_hecho'];
+             $hora_hecho = $data['hora_hecho'];
+             $lugar_hecho = $data['lugar_hecho'];
+             $comuna_hecho = $data['comuna_hecho'];
+             $region_hecho = $data['region_hecho'];
+
+            $testigo_s = $data['testigo_s'];
+            $testigo_n = $data['testigo_n'];
+            $testigo_ns = $data['testigo_ns'];
+            $testigos_nombres = $data['testigos_nombres'];
+            $testigos_direccion = $data['testigos_direccion'];
+            $testigos_observacion = $data['testigos_observacion'];
+
+            $nombre_completo_denunciante = $data['nombre_completo_denunciante'];
+            $rutpas_denunciante = $data['rutpas_denunciante']; 
+            echo $nombres_denunciante;*/
 
             $file_name =$this->create_docx($denunciafiscalia);
             print("return-> email to".$email." file".$file_name);
             if (!empty($file_name)){
-               $this->sendEmail2($file_name,$email);
+               $this->sendEmail2($file_name);
             }
 
 } 
@@ -43,10 +231,7 @@ public function postDenuncia(Request $request){
 public function sendEmail2($file_name,$email){
 
     $path = base_path().'/public';
-   
-   print($path);
-    //return File::put($path , $data)
-
+    print($path);
     require base_path("vendor/autoload.php");
   
     $mail = new PHPMailer(true);
@@ -65,15 +250,44 @@ public function sendEmail2($file_name,$email){
     $mail->addAttachment( $path."\\".$file_name);
 
 
-    $mail->Subject = 'App Denuncia Fund. Iguales';
-    $mail->Body    = 'Email generado por app iguales';
-    $mail->AltBody = 'Email generado por app iguales';
+     $mail->Subject = 'Here is the subject';
+    $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
   
     if(!$mail->send()) {
         echo 'Email could not be sent.';
         echo 'Mailer Error: ' . $mail->ErrorInfo;
     } else {
         echo 'Email has been sent.';
+    }
+}
+
+
+public function sendEmail(){
+    require base_path("vendor/autoload.php");
+    $mail = new PHPMailer(true);
+    $mail->isSMTP();
+    $mail->Host = 'smtp.office365.com';
+    $mail->Port       = 587;
+    $mail->SMTPSecure = 'tls';
+    $mail->SMTPAuth   = true;
+    $mail->Username = 'gonzalo.perez@surpoint.cl';
+    $mail->Password = 'Margarina25..,,';
+    $mail->SetFrom('gonzalo.perez@surpoint.cl', 'Gonzalo');
+    $mail->addAddress('gonpec@gmail.com', 'Gonzalo');
+    //$mail->SMTPDebug  = 3;
+    //$mail->Debugoutput = function($str, $level) {echo "debug level $level; message: $str";}; //$mail->Debugoutput = 'echo';
+    $mail->IsHTML(true);
+    $mail->addAttachment("uploads/".$file_name);
+    $mail->Subject = 'Here is the subject';
+    $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+  
+    if(!$mail->send()) {
+        echo 'Email no pudo ser enviado.';
+        echo 'Mailer Error: ' . $mail->ErrorInfo;
+    } else {
+        echo 'Email se envió.';
     }
 }
 
