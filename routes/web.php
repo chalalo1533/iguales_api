@@ -27,6 +27,7 @@ $router->get('/', function () use ($router) {
 
         $router->get('videos', 'ExampleController@getVideos');
         $router->get('safePlaces', 'ExampleController@getLugaresSeguros');
+        $router->post('commentsSafePlaces', 'CommentSafePlacesController@store');
         $router->get('notifications', 'ExampleController@getNotificaciones');
 
         $router->get('fiscalias', 'ExampleController@getFiscalias');
