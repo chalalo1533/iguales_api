@@ -110,8 +110,12 @@ public function getLugaresSeguros(){
 
 public function getFiscalias(Request $request){
      $comuna = $request->get('comuna');
-     $fiscalias = Fiscalias::where('covertura', 'LIKE', $comuna)->get();
-     return response()->json(array('success'=>true, 'fiscalias'=> $fiscalias ));
+
+      $fiscalia = Fiscalias::where('covertura', 'LIKE', '%'.$comuna.'%')->get();
+
+
+     //return response()->json(array('success'=>true, 'fiscalias'=> $fiscalias ));
+     return response()->json(array('success'=>true, 'fiscalias'=> $fiscalia )); 
 }
 
 
@@ -119,23 +123,19 @@ public function getFiscalias(Request $request){
 public function getNotificaciones(){
       $notifications = Notificacion::all();
      return response()->json(array('success'=>true, 'notifications'=> $notifications ));
-
-
-
-
 }
 
 
 
 public function postDenuncia(Request $request){
-             Log::info($request);
-             $data = $request->json()->all();
-             $denunciafiscalia = Denunciafiscalia::create($request->all());
-            $file_name =$this->create_docx($denunciafiscalia);
-            print("return->".$file_name);
-            if (!empty($file_name)){
+    Log::info($request);
+    $data = $request->json()->all();
+    $denunciafiscalia = Denunciafiscalia::create($request->all());
+    $file_name =$this->create_docx($denunciafiscalia);
+    print("return->".$file_name);
+    if (!empty($file_name)){
                $this->sendEmail($file_name);
-            }
+    }
 
 } 
 
