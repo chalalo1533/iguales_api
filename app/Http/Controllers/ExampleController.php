@@ -8,13 +8,14 @@ use App\Models\Videos;
 use App\Models\SafePlaces;
 use App\Models\Notificacion;
 use App\Models\Fiscalias;
+use App\Models\DeviceToken;
 use Carbon\Carbon;
 
 use Goutte\Client;
 use Log;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
+use Illuminate\Support\Facades\Http;
 
 //require 'vendor/phpmailer/phpmailer/src/Exception.php';
 // require 'vendor\phpmailer\phpmailer\src\PHPMailer.php';
@@ -34,16 +35,159 @@ class ExampleController extends Controller
     }
 
 
+
+static function send_notification_FCM($notification_id, $title, $message, $id,$type) {
+
+    $accesstoken = env('FCM_SERVER_KEY');
+    print_r("access->".$accesstoken);
+    $URL = 'https://fcm.googleapis.com/fcm/send';
+
+
+        $post_data = '{
+            "to" : "' . $notification_id . '",
+            "data" : {
+              "body" : "dddddd",
+              "title" : "' . $title . '",
+              "type" : "' . $type . '",
+              "id" : "' . $id . '",
+              "message" : "' . $message . '",
+            },
+            "notification" : {
+                 "body" : "' . $message . '",
+                 "title" : "' . $title . '",
+                  "type" : "' . $type . '",
+                 "id" : "' . $id . '",
+                 "message" : "' . $message . '",
+                "icon" : "new",
+                "sound" : "default"
+                },
+
+          }';
+
+
+
+        $post_data2 = '{
+            "to" : "' . $notification_id . '",
+            "data" : {
+              "body" : "sssssss",
+              "title" : "' . $title . '",
+              "message" : "' . $message . '",
+            },
+          
+          }';
+
+    print_r($post_data);
+
+    $crl = curl_init();
+
+    $headr = array();
+    $headr[] = 'Content-type: application/json';
+    $headr[] = 'Authorization:key=' . $accesstoken;
+    curl_setopt($crl, CURLOPT_SSL_VERIFYPEER, false);
+
+    curl_setopt($crl, CURLOPT_URL, $URL);
+    curl_setopt($crl, CURLOPT_HTTPHEADER, $headr);
+
+    curl_setopt($crl, CURLOPT_POST, true);
+    curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+    curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+
+    $rest = curl_exec($crl);
+    
+    print_r($rest);
+
+    if ($rest === false) {
+       //  throw new Exception('Curl error: ' . curl_error($crl));
+        print_r('Curl error: ' . curl_error($crl));
+        $result_noti = 0;
+    } else {
+
+        $result_noti = 1;
+    }
+
+    //curl_close($crl);
+    //print_r($result_noti);die;
+    return $result_noti;
+}
+
+
+
+
+static function send_notification_FCM_All( $title, $message) {
+
+    $accesstoken = env('FCM_SERVER_KEY');
+    print_r("access->".$accesstoken);
+    $URL = 'https://fcm.googleapis.com/fcm/send';
+
+
+        $post_data='{
+              "to": "/topics/all",
+              "restricted_package_name": "com.example.app_iguales",
+    "notification": {
+        "title" : "' . $title . '",
+         "body" : "' . $message . '",
+         "click_action": "FCM_PLUGIN_ACTIVITY"
+    }
+}';
+
+
+       
+
+    print_r($post_data);
+
+    $crl = curl_init();
+
+    $headr = array();
+    $headr[] = 'Content-type: application/json';
+    $headr[] = 'Authorization:key='.$accesstoken;
+    curl_setopt($crl, CURLOPT_SSL_VERIFYPEER, false);
+
+    curl_setopt($crl, CURLOPT_URL, $URL);
+    curl_setopt($crl, CURLOPT_HTTPHEADER, $headr);
+
+    curl_setopt($crl, CURLOPT_POST, true);
+    curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
+    curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+
+    $rest = curl_exec($crl);
+    
+    print_r($rest);
+
+    if ($rest === false) {
+       //  throw new Exception('Curl error: ' . curl_error($crl));
+        print_r('Curl error: ' . curl_error($crl));
+        $result_noti = 0;
+    } else {
+        $result_noti = 1;
+    }
+
+    //curl_close($crl);
+    //print_r($result_noti);die;
+    return $result_noti;
+}
+
+
+
+
+ 
+public function send_message(Request $request)
+ {  
+
+
+     $token="e9dVMd9DT9mwM607meihSJ:APA91bFkzvSplRnTNS_R-ZJPLGS2iFi5nH20C8XBgQRhdf1hPp3hgmJPxGXKiLaaXf5HVr_WP7UEhS1j5iNy39qykyzMtgcXIu52NKz9rHkhfn2jDt4pmgHzNNA8IvOg7PuJmSCGTgcx";
+   //  $resultado =  $this->send_notification_FCM($token,"test test", "mensaje men sahje", 1,"tipo");
+       $resultado =  $this->send_notification_FCM_All("test test all ", "all all all all all all ");
+     print("resultado:".$resultado);
+ }
+
+ 
+
 public function postComment_test(Request $request){
   
     $name = $request->request->get('name');
     $email = $request->request->get('email');
     $text = $request->request->get('text');
-// Log::info($request);
-//     $data = $request->json()->all();
-//     $name = $data["name"];
-//     $email = $data["email"];
-//     $text = $data["text"];
+
 
     print('test->'.$name.' email:'.$email.' texto:'.$text);
 
@@ -124,6 +268,8 @@ public function getNotificaciones(){
 
 
 
+
+
 public function postDenuncia(Request $request){
     //Log::info($request);
     $data = $request->json()->all();
@@ -199,6 +345,32 @@ public function sendEmail(){
     }
 }
 
+
+
+public function post_token(Request $request){
+    $token = $request->request->get('token');
+    $SO = $request->request->get('SO');
+    
+   $dt = new DeviceToken();
+   $dt->token = $token;
+   $dt->SO = $SO;
+   $dt->save();
+ 
+}
+
+
+
+
+public function send_msg(Request $request){
+    $title = $request->request->get('title');
+    $body = $request->request->get('body');
+    
+   $dt = new DeviceToken();
+   $dt->token = $token;
+   $dt->SO = $SO;
+   $dt->save();
+ 
+}
 
 
 

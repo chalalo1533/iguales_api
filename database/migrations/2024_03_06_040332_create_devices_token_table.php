@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSafePlaceCommentsTable extends Migration
+class CreateDevicesTokenTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,12 @@ class CreateSafePlaceCommentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('safe_place_comments', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre',200);
-            $table->string('email',200);
-            $table->text('comentario');
-            $table->integer('rating');
-            $table->integer('id_safe_place');
+        Schema::create('devices_token', function (Blueprint $table) {
+             $table->id();
+            $table->string('token',500);
             $table->timestamp('time')->useCurrent = true;
+            $table->string('SO',10);
         });
-
     }
 
     /**
@@ -32,6 +28,6 @@ class CreateSafePlaceCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('safe_place_comments');
+        Schema::dropIfExists('devices_token');
     }
 }
