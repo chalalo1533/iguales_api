@@ -10,7 +10,6 @@ use App\Models\Notificacion;
 use App\Models\Fiscalias;
 use App\Models\DeviceToken;
 use Carbon\Carbon;
-
 use Goutte\Client;
 use Log;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -35,108 +34,28 @@ class ExampleController extends Controller
     }
 
 
-
-static function send_notification_FCM($notification_id, $title, $message, $id,$type) {
-
-    $accesstoken = env('FCM_SERVER_KEY');
-    print_r("access->".$accesstoken);
-    $URL = 'https://fcm.googleapis.com/fcm/send';
-
-
-        $post_data = '{
-            "to" : "' . $notification_id . '",
-            "data" : {
-              "body" : "dddddd",
-              "title" : "' . $title . '",
-              "type" : "' . $type . '",
-              "id" : "' . $id . '",
-              "message" : "' . $message . '",
-            },
-            "notification" : {
-                 "body" : "' . $message . '",
-                 "title" : "' . $title . '",
-                  "type" : "' . $type . '",
-                 "id" : "' . $id . '",
-                 "message" : "' . $message . '",
-                "icon" : "new",
-                "sound" : "default"
-                },
-
-          }';
-
-
-
-        $post_data2 = '{
-            "to" : "' . $notification_id . '",
-            "data" : {
-              "body" : "sssssss",
-              "title" : "' . $title . '",
-              "message" : "' . $message . '",
-            },
-          
-          }';
-
-    print_r($post_data);
-
-    $crl = curl_init();
-
-    $headr = array();
-    $headr[] = 'Content-type: application/json';
-    $headr[] = 'Authorization:key=' . $accesstoken;
-    curl_setopt($crl, CURLOPT_SSL_VERIFYPEER, false);
-
-    curl_setopt($crl, CURLOPT_URL, $URL);
-    curl_setopt($crl, CURLOPT_HTTPHEADER, $headr);
-
-    curl_setopt($crl, CURLOPT_POST, true);
-    curl_setopt($crl, CURLOPT_POSTFIELDS, $post_data);
-    curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
-
-    $rest = curl_exec($crl);
-    
-    print_r($rest);
-
-    if ($rest === false) {
-       //  throw new Exception('Curl error: ' . curl_error($crl));
-        print_r('Curl error: ' . curl_error($crl));
-        $result_noti = 0;
-    } else {
-
-        $result_noti = 1;
-    }
-
-    //curl_close($crl);
-    //print_r($result_noti);die;
-    return $result_noti;
-}
-
-
-
-
 static function send_notification_FCM_All( $title, $message) {
 
     $accesstoken = env('FCM_SERVER_KEY');
-    print_r("access->".$accesstoken);
     $URL = 'https://fcm.googleapis.com/fcm/send';
-
-
-        $post_data='{
+    $post_data='{
               "to": "/topics/all",
               "restricted_package_name": "com.example.app_iguales",
+               "data" : {
+                  "body" : "' . $message . '",
+                  "title" : "' . $title . '",
+                  "message" : "' . $message . '",
+            },
     "notification": {
         "title" : "' . $title . '",
          "body" : "' . $message . '",
          "click_action": "FCM_PLUGIN_ACTIVITY"
-    }
-}';
-
-
+        }
+    }';
        
 
     print_r($post_data);
-
     $crl = curl_init();
-
     $headr = array();
     $headr[] = 'Content-type: application/json';
     $headr[] = 'Authorization:key='.$accesstoken;
@@ -154,15 +73,11 @@ static function send_notification_FCM_All( $title, $message) {
     print_r($rest);
 
     if ($rest === false) {
-       //  throw new Exception('Curl error: ' . curl_error($crl));
         print_r('Curl error: ' . curl_error($crl));
         $result_noti = 0;
     } else {
         $result_noti = 1;
     }
-
-    //curl_close($crl);
-    //print_r($result_noti);die;
     return $result_noti;
 }
 
@@ -172,12 +87,10 @@ static function send_notification_FCM_All( $title, $message) {
  
 public function send_message(Request $request)
  {  
-
-
-     $token="e9dVMd9DT9mwM607meihSJ:APA91bFkzvSplRnTNS_R-ZJPLGS2iFi5nH20C8XBgQRhdf1hPp3hgmJPxGXKiLaaXf5HVr_WP7UEhS1j5iNy39qykyzMtgcXIu52NKz9rHkhfn2jDt4pmgHzNNA8IvOg7PuJmSCGTgcx";
-   //  $resultado =  $this->send_notification_FCM($token,"test test", "mensaje men sahje", 1,"tipo");
-       $resultado =  $this->send_notification_FCM_All("test test all ", "all all all all all all ");
-     print("resultado:".$resultado);
+    $title = $request->request->get('title');
+    $message = $request->request->get('message');
+    $resultado =  $this->send_notification_FCM_All($title, $message);
+    print("resultado:".$resultado);
  }
 
  
@@ -187,20 +100,12 @@ public function postComment_test(Request $request){
     $name = $request->request->get('name');
     $email = $request->request->get('email');
     $text = $request->request->get('text');
-
-
     print('test->'.$name.' email:'.$email.' texto:'.$text);
 
 }
 
 
 public function postComment(Request $request){
-    // Log::info($request);
-    
-    // $name = $request["name"];
-    // $email = $request["email"];
-    // $text = $request["text"];
-
 
     $name = $request->request->get('name');
     $email = $request->request->get('email');
