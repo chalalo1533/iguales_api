@@ -141,7 +141,6 @@ public function postComment(Request $request){
 }
 
 
-
 public function getVideos(){
        $videos = Videos::all();
        return response()->json(array('success'=>true, 'videos'=> $videos ));
@@ -177,12 +176,19 @@ public function getNotificaciones(){
 
 public function postDenuncia(Request $request){
     //Log::info($request);
+    print("inicio post");
     $data = $request->json()->all();
+    
     $denunciafiscalia = Denunciafiscalia::create($request->all());
+    $email = $data["correo_denunciante"];
+    
+    print($email);
+    $email = "gonpec@gmail.com";
     $file_name =$this->create_docx($denunciafiscalia);
     print("return->".$file_name);
     if (!empty($file_name)){
-               $this->sendEmail($file_name);
+        print("enviando email");
+               $this->sendEmail2($file_name,$email);
     }
 
 } 
@@ -198,20 +204,21 @@ public function sendEmail2($file_name,$email){
     $mail->Host       = 'smtp.office365.com';
     $mail->Port       = 587;
     $mail->SMTPSecure = 'tls';
-    $mail->SMTPAuth   = true;
+    $mail->SMTPAuth   =  true;
     $mail->Username   = 'gonzalo.perez@surpoint.cl';
-    $mail->Password   = 'Margarina25..,,';
+    $mail->Password   = 'Margarina25..,,..';
     $mail->SetFrom('gonzalo.perez@surpoint.cl', 'Gonzalo');
     $mail->addAddress($email, $email);
     //$mail->SMTPDebug  = 3;
     //$mail->Debugoutput = function($str, $level) {echo "debug level $level; message: $str";}; //$mail->Debugoutput = 'echo';
     $mail->IsHTML(true);
+    print("adjunto->".$path."\\".$file_name);
     $mail->addAttachment( $path."\\".$file_name);
 
 
-     $mail->Subject = 'Here is the subject';
-    $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+     $mail->Subject = 'Denuncia ingresada desde ActuaApp ';
+    $mail->Body    = 'Se adjunta archivo con denuncia ingresada desde ActuaApp. ';
+    $mail->AltBody = '';
   
     if(!$mail->send()) {
         echo 'Email could not be sent.';
@@ -287,7 +294,9 @@ public function create_docx($data)
   try
    {
   
-    echo $filename;
+ //   echo $filename;
+  Log::info("archivo:");
+    Log::info($filename);
     $templateProcessor = new TemplateProcessor('formulario_template.docx');
     $templateProcessor->setValue('fecha_denuncia',$data["fecha_denuncia"]);
     $templateProcessor->setValue('hora_denuncia',$data["hora_denuncia"]);
@@ -368,9 +377,13 @@ public function create_docx($data)
     $templateProcessor->setValue('comuna_hecho',$data["comuna_hecho"]);
     $templateProcessor->setValue('region_hecho',$data["region_hecho"]);
     $templateProcessor->setValue('texto_hecho',$data["texto_hecho"]);
+
+    
     $templateProcessor->setValue('testigo_s',$data["testigo_s"]);
     $templateProcessor->setValue('testigo_n',$data["testigo_n"]);
     $templateProcessor->setValue('testigo_ns',$data["testigo_ns"]);
+
+
     $templateProcessor->setValue('testigos_nombres',$data["testigos_nombres"]);
     $templateProcessor->setValue('testigos_direccion',$data["testigos_direccion"]);
     $templateProcessor->setValue('testigos_observacion',$data["testigos_observacion"]);
@@ -379,7 +392,7 @@ public function create_docx($data)
     $templateProcessor->saveAs($filename);
 
   }catch(Exception $e){
-
+       print('error ->'.$e);
        return "";
   }
   return $filename;
