@@ -15,7 +15,9 @@ use Log;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 //require 'vendor/phpmailer/phpmailer/src/Exception.php';
 // require 'vendor\phpmailer\phpmailer\src\PHPMailer.php';
 // require 'vendor\phpmailer\phpmailer\src\SMTP.php';
@@ -183,22 +185,29 @@ public function postDenuncia(Request $request){
     $email = $data["correo_denunciante"];
     
     print($email);
-    $email = "gonpec@gmail.com";
+   // $email = "gonpec@gmail.com";
     $file_name =$this->create_docx($denunciafiscalia);
     print("return->".$file_name);
+    
+    $image = $data["imagen1"];
+    $image = str_replace('data:image/png;base64,', '', $image);
+    $image = str_replace(' ', '+', $image);
+    $imageName =  Str::random(15).'.'.'png';
+    print("<br>Imagen->".$imageName);
+
+    File::put(storage_path(). '/' . $imageName, base64_decode($image));
+  //   Storage::disk('public')->put($imageName, base64_decode($image));
     if (!empty($file_name)){
         print("enviando email");
-               $this->sendEmail2($file_name,$email);
+               $this->sendEmail2($file_name,$email,$imageName);
     }
-
 } 
 
-public function sendEmail2($file_name,$email){
+public function sendEmail2($file_name,$email,$imageName){
 
     $path = base_path().'/public';
     print($path);
     require base_path("vendor/autoload.php");
-  
     $mail = new PHPMailer(true);
     $mail->isSMTP();
     $mail->Host       = 'smtp.office365.com';
@@ -214,10 +223,10 @@ public function sendEmail2($file_name,$email){
     $mail->IsHTML(true);
     print("adjunto->".$path."\\".$file_name);
     $mail->addAttachment( $path."\\".$file_name);
+    $mail->addAttachment(storage_path(). '/' . $imageName );
 
-
-     $mail->Subject = 'Denuncia ingresada desde ActuaApp ';
-    $mail->Body    = 'Se adjunta archivo con denuncia ingresada desde ActuaApp. ';
+    $mail->Subject = 'Denuncia ingresada desde Actuapp ';
+    $mail->Body    = 'Se adjunta archivo con denuncia ingresada desde Actuapp. ';
     $mail->AltBody = '';
   
     if(!$mail->send()) {
@@ -225,9 +234,9 @@ public function sendEmail2($file_name,$email){
         echo 'Mailer Error: ' . $mail->ErrorInfo;
     } else {
         echo 'Email has been sent.';
+         File::delete(storage_path(). '/' . $imageName);
     }
 }
-
 
 public function sendEmail(){
     require base_path("vendor/autoload.php");
@@ -256,7 +265,6 @@ public function sendEmail(){
         echo 'Email se envió.';
     }
 }
-
 
 
 public function post_token(Request $request){
